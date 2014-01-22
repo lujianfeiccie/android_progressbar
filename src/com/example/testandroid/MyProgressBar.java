@@ -10,13 +10,16 @@ import android.util.Log;
 import android.widget.ProgressBar;
 
 public class MyProgressBar extends ProgressBar {
-	String text;  
-    Paint mPaint;
-    int textColor = Color.BLACK;
-    int textSize = 40;
 	private String tag = "MyProgressBar";  
-  
-	private Context context = null;
+    private String text="";  
+    private Paint mPaint;
+    private int textColor = Color.BLACK;
+    private int textSize = 20;
+    private int max = 100;
+    private Context context = null;
+    
+    public static final int STATUS_SELLED = 101;
+    public static final int STATUS_FAILED = 102;
     public MyProgressBar (Context context) {  
         this(context,null);  
     }  
@@ -24,6 +27,7 @@ public class MyProgressBar extends ProgressBar {
     public MyProgressBar (Context context, AttributeSet attrs, int defStyle) {  
         super(context, attrs, defStyle);  
         this.context = context;
+        setMax(max);
         initText();  
     }  
   
@@ -33,7 +37,7 @@ public class MyProgressBar extends ProgressBar {
   
     @Override  
     public synchronized void setProgress(int progress) {  
-    	setText(progress);
+            setText(progress);
         super.setProgress(progress);  
     }  
   
@@ -56,28 +60,41 @@ public class MyProgressBar extends ProgressBar {
         this.mPaint.setTextSize(textSize);  
     }  
     public void setTextColor(int color){
-    	this.textColor = color;
-    	updateTextStyle();
+            this.textColor = color;
+            updateTextStyle();
     }
     public void setTextSize(int textSize){
-    	this.textSize = textSize;
-    	updateTextStyle();
+            this.textSize = textSize;
+            updateTextStyle();
     }
     private void updateTextStyle(){
-    	this.mPaint.setColor(textColor);
-    	this.mPaint.setTextSize(textSize);
+            this.mPaint.setColor(textColor);
+            this.mPaint.setTextSize(textSize);
     }
   
     private void setText(int progress) {  
+    	if(progress == STATUS_SELLED){  
+        	this.text = String.format("已售");
+        	setProgressDrawable(context.getResources().getDrawable(R.drawable.barcolor_selled));
+        	return;
+        }
+    	if(progress == STATUS_FAILED){  
+    		this.text = String.format("发布失败");
+    		setProgressDrawable(context.getResources().getDrawable(R.drawable.barcolor_failed));
+    		return;
+    	}
+    	
         float i = (float)(progress * 100) / (float)this.getMax();  
         if(i>=100){
-        	this.text = String.format("发布成功");
-        	setProgressDrawable(context.getResources().getDrawable(R.drawable.barcolor_finish));
-        }else{
-        	this.text = String.format("发布中 %s%%", (int)i);
+                this.text = String.format("在售中");
+                setProgressDrawable(context.getResources().getDrawable(R.drawable.barcolor_finish));
+        }else if(i>0){
+                this.text = String.format("发布中 %s%%", (int)i);
         }
     } 
     void log(String msg){
-    	Log.d(tag , msg);
+            Log.d(tag , msg);
     }
 }
+
+
